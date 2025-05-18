@@ -4,16 +4,6 @@
   remote_user: kali
   become: true
   tasks:
-    - name: Install nginx
-      ansible.builtin.apt:
-        name: nginx
-        state: present
-      
-    - name: Start nginx
-      ansible.builtin.service: 
-        name: nginx
-        state: started
-      
     - name: Copy static content
       ansible.builtin.copy:
         src: index.html
@@ -21,3 +11,15 @@
         owner: root
         group: root
         mode: '0644'
+      notify: Restart nginx
+
+    - name: Enable nginx
+      ansible.builtin.service:
+        name: nginx
+        enabled: true
+
+  handlers:
+    - name: Restart nginx
+      ansible.builtin.service:
+        name: nginx
+        state: restarted

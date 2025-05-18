@@ -1,5 +1,7 @@
 Note: Some points of these notes are taken from official docs.
 
+#day 1 Ansible theory
+
 Why ansible?
 
 - Let’s say we have 100’s of servers with windows, ubuntu and CentOs operating systems. Now, In order to peform tasks like updates, security patches, package installation like git or database in all those servers, it becomes very hard.
@@ -23,31 +25,61 @@ Cons:
 - Performance issues when managing thousands of servers.
 
 
-Ansible (practical)
 
-- Ansible ad hoc commands
-- Ansible inventory
-- Ansible playbooks
+#day 2 Ansible (practical)
 
+Today, I learned about ansible ad hoc commands, inventory, wrote some ansible playbooks.
 
-ANSIBLE PLAYBOOKS:
+- Ad hoc commands: These are the ansible commands used to execute single task on the target nodes. These are like shell commands. These are quick and easy but not re-usable.
 
-- Ansible Playbooks offer a repeatable, reusable, simple configuration management and multi-machine deployment system, one that is well suited to deploying complex applications. If you need to execute a task with Ansible more than once, write a playbook and put it under source control. Then you can use the playbook to push out new configuration or confirm the configuration of remote systems.
-- Playbooks are expressed in YAML format with a minimum of syntax
+I practised the following task using ad hoc commands:
+ - Rebooting servers
+ - Managing files
+ - Managing user and groups
+ - Managing packages
+ - Managing services 
 
-**Playbook execution**
+eg: ansible -i inventory all -m copy -a "src=copy.txt dest=/home/kali" -u kali --ask-become-pass
 
-- A playbook runs in order from top to bottom. Within each play, tasks also run in order from top to bottom.
+- Inventory: Inventory is the file where we lists target hosts. We can organize them into multiple groups. So that we can perform tasks based on the groups.
 
-**Task execution**
+- Playbook: These are the file where we define the actual tasks to perform on the target machines. We write playbooks in yaml format. In simple words, inventory defines where to run tasks and playbook defines what tasks to run.
 
-- By default, Ansible executes each task in order, one at a time, against all machines matched by the host pattern. Each task executes a module with specific arguments. When a task has executed on all target machines, Ansible moves on to the next task. To change this default behavior. Within each play, Ansible applies the same task directives to all hosts. If a task fails on a host, Ansible takes that host out of the rotation for the rest of the playbook.
-
-Check mode
-
-- Ansible’s check mode allows you to execute a playbook without applying any alterations to your systems. You can use check mode to test playbooks before implementing them in a production environment.
-To run a playbook in check mode, you can pass the `-C` or `--check` flag to the `ansible-playbook` command: `ansible-playbook --check playbook.yaml`
+I wrote some basic playbooks like installing, starting, removing package, installing lists of packages, removing dependencies, removing cache, installing deb package etc.
 
 
-Roles:
+
+#day 3  Practise ansible
+
+I studied:
+
+1. How ansible transfers and executes python scripts (tasks we write in each play) on the hosts (managed nodes).
+2. Studied different builtin ansible modules. 
+3. Ansible roles: Ansible roles provide standard and structured way to write ansible playbooks. Its helps to break our playbooks into smaller, reusable components by grouping related files and logic together — such as tasks, handlers, templates, files, variables, and defaults. This approach promotes reusability, maintainability, and consistency across different playbooks and environments.
+
+Key Components of an Ansible Role:
+
+- Tasks: The main list of actions that we need to perform on the managed nodes.
+
+- Handlers: Tasks that are triggered by changes in other tasks. Mostly used for actions like restarting services.
+
+- Files: Static files that need to be copied to managed hosts.
+
+- Templates: Helps to create dynamic content by embedding variables, logic and loops.
+
+- Vars: Variables that are used within the role. High priority than defaults
+
+- Defaults: Default variables for the role, which can be overridden. Low priority than vars.
+
+- Meta: Metadata about the role, including dependencies on other roles, role_version_info.
+
+
+I practised:
+- Installing apache and serving static content.
+- Installing nginx and serving static content by the use of ansible roles.
+- Configuring jboss server: Tried to read and then imitate the already written jboss configuration ansible playbook. 
+  
+You can go through my ansible playbooks: https://github.com/biplabtharu/ansible
+
+
     
