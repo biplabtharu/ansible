@@ -1,0 +1,96 @@
+---
+
+- name: Install deps
+  apt: 
+    name: "{{item}}"
+    state: present
+  loop: 
+    - zip
+    - java-1.7.0-openjdk
+    - libselinux-python
+    - libsemanage-python
+
+- name: Install jbos server
+  get_url:
+    url: http://download.jboss.org/jbossas/7.1/jboss-as-7.1.1.Final/jboss-as-7.1.1.Final.zip
+    dest: /opt/jboss-as-7.1.1.Final.zip
+
+- name: Extract archive
+  ansible.builtin.unarchive:
+    dest: /usr/share
+    src: /opt/jboss-as-7.1.1.Final.zip
+    creates: /usr/share/jboss-as
+    remote_src: no
+
+- name: Rename install directory
+  command: /bin/mv jboss-as-7.1.1.Final jboss-as
+  args:
+    chdir: /usr/share
+    creates: /usr/share/jboss-as
+
+- name: Copying standalone.xml config file
+  copy:
+    src: standalone.xml
+    dest: /usr/share/jboss-as/standalone/configuration
+  notify: restart-jboss
+
+- name: Add group jboss
+  group: 
+    name: jboss
+    state: present
+  
+- name: Add user jboss
+  user:
+    name: jboss
+    group: jboss
+    home: /usr/share/jboss-as
+
+- name: Change ownership of jboss installation
+  file: 
+    path: /usr/share/jboss-as
+    owner: jboss
+    group: jboss
+    state: directory
+    recurse: yes
+
+- name: Copy the init script
+  copy:
+    src: jboss-as-standalone.sh
+    dest: /etc/init.d/jboss
+    mode: 0755
+  
+- name: Workaround for systemd bug
+  shell: service jboss start && chkconfig jboss on
+  ignore_errors: true
+
+- name: Enable jboss to be started at root
+  service: 
+    name: jboss
+    enabled: yes
+    state: started
+
+- name: Display iptable rules
+  template:
+    src: iptables-save
+    dest: /etc/sysconfig/iptables
+  when: ansible_distribution_major_version != "7"
+  notify: restart iptables
+
+- name: Ensure that firewall is started
+  service:
+    name: firewalld
+    state: started
+  when: ansible_distribution_major_version == "7"
+
+- name: Deploy firewalld rules
+  ansible.posix.firewalld:
+    immediate: yes
+    port: "{{item}}"
+    state: enabled
+    permanent: yes
+  when: ansible_distribution_major_version == "7"
+  loop:
+  - "{{ http_port }}/tcp"
+  - "{{ https_port }}/tcp"
+
+

@@ -1,0 +1,14 @@
+---
+- name: Install multiple dependencies
+  hosts: all
+  remote_user: kali
+  become: true
+
+  tasks:
+    - name: install package
+      apt:
+        name: "{{item}}"
+        state: present
+      with_items:
+        - zip 
+        - httpd

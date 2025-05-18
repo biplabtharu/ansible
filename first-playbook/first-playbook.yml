@@ -1,0 +1,17 @@
+---
+- name: Install and start service
+  hosts: all
+  remote_user: kali
+  become: true
+
+  tasks:
+  - name: install nginx
+    apt: 
+      name: nginx
+      state: present
+  
+  - name: start nginx
+    service: 
+      name: nginx
+      state: started
+

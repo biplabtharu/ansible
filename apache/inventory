@@ -1,0 +1,6 @@
+[virtual_machine_servers]
+192.168.56.101
+
+[web_servers]
+
+[db_servers]

@@ -1,0 +1,51 @@
+---
+- name: Update web servers
+  hosts: web_servers
+  remote_user: kali
+  become: true
+
+  tasks:
+  - name: Update cache
+    apt:
+      update_cache: yes
+
+  - name: Ensure nginx is at latest version
+    apt:
+      name: nginx
+      state: latest 
+  
+  - name: install httpd with no recommends
+    apt:
+      name: httpd
+      state: present
+      install_recommends: no
+    
+  - name: autoremove
+    apt: 
+      autoremove: yes
+
+  - name: autoclean
+    apt:
+      autoclean: yes
+  
+  - name: copy file
+    copy:
+      src: summary.md
+      dest: /home/kali
+      mode: 600
+      owner: kali
+      group: kai
+
+  - name: install file using http, https or ftp
+    get_url:
+      url: ""
+      dest: /opt/file
+      mode: 600
+
+  - name: install multiple dependencies
+    apt:
+      name: "{{item}}"
+      state: present
+    with_items:
+      - zip
+      - python3

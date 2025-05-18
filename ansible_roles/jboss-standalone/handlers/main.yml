@@ -1,0 +1,10 @@
+---
+- name: Restart jboss
+  ansible.builtin.service:
+    name: jboss
+    state: restarted
+
+- name: Restart iptables
+  ansible.builtin.service:
+    name: iptables
+    state: restarted
