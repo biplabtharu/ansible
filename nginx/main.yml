@@ -1,0 +1,23 @@
+---
+- name: Install nginx and server static content
+  hosts: servers
+  remote_user: kali
+  become: true
+  tasks:
+    # - name: Install nginx
+    #   ansible.builtin.apt:
+    #     name: nginx
+    #     state: present
+      
+    # - name: Start nginx
+    #   ansible.builtin.service: 
+    #     name: nginx
+    #     state: started
+      
+    - name: Copy static content
+      ansible.builtin.copy:
+        src: index.html
+        dest: /var/www/html
+        owner: root
+        group: root
+        mode: '0644'
